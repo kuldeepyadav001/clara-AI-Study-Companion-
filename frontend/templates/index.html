@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">  
+    <title>Clara - AI Study Companion</title>
+    <!-- Direct link to CSS -->
+    <link rel="stylesheet" type="text/css" href="../static/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1>✨ Clara - AI Study Companion ✨</h1>
+        <nav>
+            <ul>
+                <li><a href="#chat">💬 Chat</a></li>
+                <li><a href="#quiz">📝 Quiz</a></li>
+                <li><a href="#progress">📈 Progress</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Chat Section -->
+    <section id="chat">
+        <h2>💬 Ask Clara a question:</h2>
+        <div id="chat-window"></div>
+        <input type="text" id="user-message" placeholder="Ask Clara...">
+        <button onclick="sendMessage()">🚀 Send</button>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quiz">
+        <h2>📝 Generate a Quiz:</h2>
+        <input type="text" id="quiz-topic" placeholder="Enter topic...">
+        <button onclick="generateQuiz()">🎯 Generate Quiz</button>
+        <div id="quiz-container"></div>
+    </section>
+
+    <!-- Progress Section -->
+    <section id="progress">
+        <h2>📈 Your Learning Progress:</h2>
+        <button onclick="loadProgress()">📊 Load Progress</button>
+        <div id="progress-container"></div>
+    </section>
+
+    <noscript>
+        <p>⚠️ JavaScript is required for this app. Please enable JavaScript in your browser.</p>
+    </noscript>
+
+    <!-- Direct link to JavaScript -->
+    <script src="../static/js/script.js" defer></script>
+</body>
+</html>
