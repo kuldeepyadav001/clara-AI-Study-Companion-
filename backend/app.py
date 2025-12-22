@@ -77,9 +77,9 @@ def create_app():
     # Register blueprints (modular routes)
     # Import inside function so app can still start even if blueprints error
     try:
-        from backend.routes.chat import chat_bp
-        from backend.routes.quiz import quiz_bp
-        from backend.routes.progress import progress_bp
+        from routes.chat import chat_bp
+        from routes.quiz import quiz_bp
+        from routes.progress import progress_bp
 
         # Register blueprints directly under /api
         app.register_blueprint(chat_bp, url_prefix="/api/chat")

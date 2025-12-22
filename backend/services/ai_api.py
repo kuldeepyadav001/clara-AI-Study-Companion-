@@ -39,22 +39,12 @@ try:
             logger.error(f"Error testing OpenAI client: {e}")
             _use_openai = False
             _using_new_sdk = False
+            _client = None
 except Exception as e:
     logger.error(f"Error initializing OpenAI client: {e}")
-    try:
-        # Fallback to older openai package interface
-        import openai
-        if OPENAI_API_KEY:
-            openai.api_key = OPENAI_API_KEY
-            _client = openai
-            _use_openai = True
-            _using_new_sdk = False
-            logger.debug("Successfully initialized legacy OpenAI client")
-    except Exception as e:
-        logger.error(f"Error initializing legacy OpenAI client: {e}")
-        _client = None
-        _use_openai = False
-        _using_new_sdk = False
+    _use_openai = False
+    _using_new_sdk = False
+    _client = None
 
 SYSTEM_PROMPT = (
     "You are an AI Study Companion that explains clearly, step-by-step, "
@@ -84,30 +74,14 @@ def ask_ai(message: str, topic: Optional[str] = None) -> str:
                 ],
                 temperature=0.2
             )
-            # Access several possible response shapes safely
-            try:
-                return resp.choices[0].message.content.strip()
-            except Exception:
-                # fallback to dict-like access
-                return resp["choices"][0]["message"]["content"].strip()
+            content = resp.choices[0].message.content
+            if content is None:
+                return "No response from AI"
+            return content.strip()
         else:
-            # older openai package
-            resp = _client.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_content}
-                ],
-                temperature=0.2
-            )
-            # older responses may be dict-like
-            if isinstance(resp, dict):
-                return resp.get("choices", [])[0].get("message", {}).get("content", "").strip()
-            # object-like
-            try:
-                return resp.choices[0].message.content.strip()
-            except Exception:
-                return str(resp)
+            # This should not happen now, but kept for compatibility
+            return f"(AI placeholder) You asked: '{message}'. Topic: '{topic or 'general'}'. " \
+                   "Add your OPENAI_API_KEY in .env to get real AI responses."
     except Exception as e:
         # Log full exception for diagnostics but return a friendly placeholder
         logger.error(f"AI request failed: {e}", exc_info=True)
@@ -156,33 +130,19 @@ def generate_quiz(topic: str, num_questions: int = 5) -> Dict:
     try:
         if _using_new_sdk:
             resp = _client.chat.completions.create(
-                model="gpt-4-turbo-preview",
+                model="gpt-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "Return strictly valid JSON. No extra commentary."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.3
             )
-            try:
-                content = resp.choices[0].message.content.strip()
-            except Exception:
-                content = resp["choices"][0]["message"]["content"].strip()
+            content = resp.choices[0].message.content
+            if content is None:
+                raise ValueError("No content from AI")
         else:
-            resp = _client.ChatCompletion.create(
-                model="gpt-4-turbo-preview",
-                messages=[
-                    {"role": "system", "content": "Return strictly valid JSON. No extra commentary."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.3
-            )
-            if isinstance(resp, dict):
-                content = resp.get("choices", [])[0].get("message", {}).get("content", "").strip()
-            else:
-                try:
-                    content = resp.choices[0].message.content.strip()
-                except Exception:
-                    content = str(resp)
+            # Should not happen
+            raise ValueError("AI not available")
 
         # Ensure valid JSON (the model is instructed to output JSON)
         quiz = json.loads(content)

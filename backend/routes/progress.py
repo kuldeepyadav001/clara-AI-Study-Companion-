@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.storage import (
+from services.storage import (
     read_progress,
     save_study_event,
     save_quiz_result

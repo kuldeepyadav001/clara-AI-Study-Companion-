@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.ai_api import ask_ai
+from services.ai_api import ask_ai
 import logging
 
 chat_bp = Blueprint("chat_bp", __name__)
